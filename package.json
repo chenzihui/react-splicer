@@ -1,0 +1,63 @@
+{
+  "name": "react-splicer",
+  "description": "A React.js component for inserting Facebook-like mentions",
+  "version": "0.1.0",
+  "author": "Chen Zihui <hello@chenzihui.com>",
+  "main": "src/Splicer.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenzihui/react-splicer"
+  },
+  "homepage": "https://github.com/chenzihui/react-splicer",
+  "bugs": "https://github.com/chenzihui/react-splicer/issues",
+  "scripts": {
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "react": "^0.13.0"
+  },
+  "devDependencies": {
+    "babel-jest": "^4.0.0",
+    "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
+    "del": "^1.1.1",
+    "gulp": "^3.8.11",
+    "gulp-plumber": "^0.6.6",
+    "gulp-uglify": "^1.1.0",
+    "gulp-util": "^3.0.4",
+    "gulp-webserver": "^0.9.0",
+    "jest-cli": "^0.4.0",
+    "vinyl-source-stream": "^1.0.0",
+    "watchify": "^2.4.0"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
+    "unmockedModulePathPatterns": [
+      "<rootDir>/node_modules/react"
+    ],
+    "testFileExtensions": [
+      "es6",
+      "js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "es6"
+    ]
+  },
+  "license": "MIT",
+  "tags": [
+    "react",
+    "mentions",
+    "typeahead"
+  ],
+  "keywords": [
+    "react",
+    "react-component",
+    "typeahead",
+    "mentions",
+    "tokens",
+    "input",
+    "textarea"
+  ]
+}
