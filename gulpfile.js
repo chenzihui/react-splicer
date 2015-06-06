@@ -28,7 +28,7 @@ gulp.task('clean:example', function(done) {
 });
 
 gulp.task('example:dev', ['clean:example'], function() {
-  var b = _setupBrowserify('./example/js/app.js'),
+  var b = _setupBrowserify('./example/js/main.js'),
       w = watchify(b);
 
   return w.on('update', function() {
@@ -53,3 +53,5 @@ gulp.task('webserver', ['example:dev'], function() {
       port: 8080
     }));
 });
+
+gulp.task('default', ['webserver']);

@@ -1,0 +1,33 @@
+* {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
+  color: #444;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.container {
+  margin: 0 auto;
+  padding-top: 100px;
+  width: 600px;
+}
+
+.splicer {
+
+}
+
+.splicer__user-input {
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  height: 34px;
+  padding: 5px 10px 7px;
+}
+
+.splicer__user-input:focus {
+  outline: 0;
+}
