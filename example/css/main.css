@@ -5,7 +5,7 @@
 }
 
 body {
-  color: #444;
+  color: #777;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -15,6 +15,10 @@ body {
   margin: 0 auto;
   padding-top: 100px;
   width: 600px;
+}
+
+.hidden {
+  display: none;
 }
 
 .splicer {
@@ -30,4 +34,28 @@ body {
 
 .splicer__user-input:focus {
   outline: 0;
+}
+
+.splicer__list {
+  box-shadow: 0 -1px 0 rgba(0,0,0,.2);
+  list-style-type: none;
+  margin: -1px 0 0;
+  padding: 0;
+}
+
+.splicer__list__item {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-top: none;
+}
+
+.splicer__list__item a {
+  color: #05a9e3;
+  display: block;
+  padding: 5px 10px 7px;
+  text-decoration: none;
+}
+
+.splicer__list__item a:hover {
+  background-color: #f2f4f6;
 }

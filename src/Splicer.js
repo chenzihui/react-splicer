@@ -1,9 +1,12 @@
 'use strict';
 
 import React from 'react';
-import { debounce } from './helpers';
+import SplicerList from './SplicerList';
 
-const ENTER_KEY = 13;
+const KEYS = {
+  ENTER: 13,
+  ESC: 27
+};
 
 class Splicer extends React.Component {
   constructor(props) {
@@ -11,25 +14,52 @@ class Splicer extends React.Component {
 
     this.state = { searchTerm: null };
 
-    this._handleKeyUp = debounce(this._handleKeyUp, 100).bind(this);
+    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleKeyUp = this._handleKeyUp.bind(this);
   }
 
   render() {
+    let data;
+
+    if (this.state.searchTerm) {
+      data = this.props.data.filter((item) => {
+        return item.toLowerCase()
+          .indexOf(this.state.searchTerm.toLowerCase()) !== -1;
+      });
+    } else {
+      data = [];
+    }
+
     return (
       <div className="splicer">
         <div
           ref="userInput"
           className="splicer__user-input"
           contentEditable="true"
+          onKeyPress={this._handleKeyPress}
           onKeyUp={this._handleKeyUp}></div>
+
+        <SplicerList
+          data={data}
+          insertFn={this._insertSelected} />
       </div>
     );
   }
 
-  _handleKeyUp(evt) {
-    if (evt.which === ENTER_KEY) {
+  _handleKeyPress(evt) {
+    if (evt.which === KEYS.ENTER) {
       evt.preventDefault();
       return this._fireCallback(evt.target.textContent);
+    }
+  }
+
+  _handleKeyUp(evt) {
+    if (evt.which === KEYS.ENTER) {
+      return;
+    }
+
+    if (evt.which === KEYS.ESC) {
+      return this.setState({ searchTerm: null });
     }
 
     this._setSearchTerm();
@@ -59,6 +89,11 @@ class Splicer extends React.Component {
     } else {
       this.setState({ searchTerm: null });
     }
+  }
+
+  _insertSelected(data) {
+    let result = this.props.transformFn(data);
+    console.log(result);
   }
 };
 

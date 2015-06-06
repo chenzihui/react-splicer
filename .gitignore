@@ -3,3 +3,6 @@
 
 # Dependency directory
 node_modules
+
+# Example js
+example/app.js

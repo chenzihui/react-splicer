@@ -13,6 +13,12 @@ var React = _interopRequire(require("react"));
 
 var Splicer = _interopRequire(require("../../src/Splicer"));
 
+var transformFn = function transformFn(text) {
+  return ":" + text + ":";
+};
+
+var callback = function callback() {};
+
 var App = (function (_React$Component) {
   function App() {
     _classCallCheck(this, App);
@@ -27,10 +33,16 @@ var App = (function (_React$Component) {
   _createClass(App, {
     render: {
       value: function render() {
+        var data = ["Apple", "Orange", "Banana", "Pineapple"];
+
         return React.createElement(
           "div",
           { className: "container" },
-          React.createElement(Splicer, { charCount: 2 })
+          React.createElement(Splicer, {
+            charCount: 2,
+            data: data,
+            transformFn: transformFn,
+            callback: callback })
         );
       }
     }
@@ -19836,9 +19848,12 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var React = _interopRequire(require("react"));
 
-var debounce = require("./helpers").debounce;
+var SplicerList = _interopRequire(require("./SplicerList"));
 
-var ENTER_KEY = 13;
+var KEYS = {
+  ENTER: 13,
+  ESC: 27
+};
 
 var Splicer = (function (_React$Component) {
   function Splicer(props) {
@@ -19848,7 +19863,8 @@ var Splicer = (function (_React$Component) {
 
     this.state = { searchTerm: null };
 
-    this._handleKeyUp = debounce(this._handleKeyUp, 100).bind(this);
+    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleKeyUp = this._handleKeyUp.bind(this);
   }
 
   _inherits(Splicer, _React$Component);
@@ -19856,6 +19872,18 @@ var Splicer = (function (_React$Component) {
   _createClass(Splicer, {
     render: {
       value: function render() {
+        var _this = this;
+
+        var data = undefined;
+
+        if (this.state.searchTerm) {
+          data = this.props.data.filter(function (item) {
+            return item.toLowerCase().indexOf(_this.state.searchTerm.toLowerCase()) !== -1;
+          });
+        } else {
+          data = [];
+        }
+
         return React.createElement(
           "div",
           { className: "splicer" },
@@ -19863,15 +19891,30 @@ var Splicer = (function (_React$Component) {
             ref: "userInput",
             className: "splicer__user-input",
             contentEditable: "true",
-            onKeyUp: this._handleKeyUp })
+            onKeyPress: this._handleKeyPress,
+            onKeyUp: this._handleKeyUp }),
+          React.createElement(SplicerList, {
+            data: data,
+            insertFn: this._insertSelected })
         );
+      }
+    },
+    _handleKeyPress: {
+      value: function _handleKeyPress(evt) {
+        if (evt.which === KEYS.ENTER) {
+          evt.preventDefault();
+          return this._fireCallback(evt.target.textContent);
+        }
       }
     },
     _handleKeyUp: {
       value: function _handleKeyUp(evt) {
-        if (evt.which === ENTER_KEY) {
-          evt.preventDefault();
-          return this._fireCallback(evt.target.textContent);
+        if (evt.which === KEYS.ENTER) {
+          return;
+        }
+
+        if (evt.which === KEYS.ESC) {
+          return this.setState({ searchTerm: null });
         }
 
         this._setSearchTerm();
@@ -19904,6 +19947,12 @@ var Splicer = (function (_React$Component) {
           this.setState({ searchTerm: null });
         }
       }
+    },
+    _insertSelected: {
+      value: function _insertSelected(data) {
+        var result = this.props.transformFn(data);
+        console.log(result);
+      }
     }
   });
 
@@ -19914,32 +19963,123 @@ var Splicer = (function (_React$Component) {
 
 module.exports = Splicer;
 
-},{"./helpers":"/Users/iuhiz/projects/react-splicer/src/helpers/index.js","react":"/Users/iuhiz/projects/react-splicer/node_modules/react/react.js"}],"/Users/iuhiz/projects/react-splicer/src/helpers/index.js":[function(require,module,exports){
+},{"./SplicerList":"/Users/iuhiz/projects/react-splicer/src/SplicerList.js","react":"/Users/iuhiz/projects/react-splicer/node_modules/react/react.js"}],"/Users/iuhiz/projects/react-splicer/src/SplicerList.js":[function(require,module,exports){
 "use strict";
 
-exports.debounce = debounce;
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-"use strict";
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-function debounce(fn, delay) {
-  var timeout = undefined;
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  return function () {
-    var self = this,
-        args = arguments;
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-    var later = function later() {
-      timeout = null;
-      fn.apply(self, args);
-    };
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-    clearTimeout(timeout);
-    timeout = setTimeout(later, delay);
-  };
-}
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var React = _interopRequire(require("react"));
+
+var SplicerListItem = _interopRequire(require("./SplicerListItem"));
+
+var SplicerList = (function (_React$Component) {
+  function SplicerList(props) {
+    _classCallCheck(this, SplicerList);
+
+    _get(Object.getPrototypeOf(SplicerList.prototype), "constructor", this).call(this, props);
+  }
+
+  _inherits(SplicerList, _React$Component);
+
+  _createClass(SplicerList, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        var classes = this.props.data.length === 0 ? "splicer__list hidden" : "splicer__list";
+
+        var items = this.props.data.map(function (item, idx) {
+          return React.createElement(SplicerListItem, {
+            key: idx,
+            data: item,
+            callback: _this.props.insertFn });
+        });
+
+        return React.createElement(
+          "ul",
+          { className: classes },
+          items
+        );
+      }
+    }
+  });
+
+  return SplicerList;
+})(React.Component);
 
 ;
 
-},{}]},{},["./example/js/main.js"]);
+module.exports = SplicerList;
+
+},{"./SplicerListItem":"/Users/iuhiz/projects/react-splicer/src/SplicerListItem.js","react":"/Users/iuhiz/projects/react-splicer/node_modules/react/react.js"}],"/Users/iuhiz/projects/react-splicer/src/SplicerListItem.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var React = _interopRequire(require("react"));
+
+var ENTER_KEY = 13;
+
+var SplicerListItem = (function (_React$Component) {
+  function SplicerListItem(props) {
+    _classCallCheck(this, SplicerListItem);
+
+    _get(Object.getPrototypeOf(SplicerListItem.prototype), "constructor", this).call(this, props);
+
+    this._handleKeyPress = this._handleKeyPress.bind(this);
+  }
+
+  _inherits(SplicerListItem, _React$Component);
+
+  _createClass(SplicerListItem, {
+    render: {
+      value: function render() {
+        return React.createElement(
+          "li",
+          { className: "splicer__list__item" },
+          React.createElement(
+            "a",
+            {
+              ref: "selectable",
+              href: "#",
+              onKeyPress: this._handleKeyPress },
+            this.props.data
+          )
+        );
+      }
+    },
+    _handleKeyPress: {
+      value: function _handleKeyPress(evt) {
+        evt.preventDefault();
+
+        if (evt.which === ENTER_KEY) {
+          this.props.callback(this.props.data);
+        }
+      }
+    }
+  });
+
+  return SplicerListItem;
+})(React.Component);
+
+;
+
+module.exports = SplicerListItem;
+
+},{"react":"/Users/iuhiz/projects/react-splicer/node_modules/react/react.js"}]},{},["./example/js/main.js"]);

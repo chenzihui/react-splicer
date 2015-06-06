@@ -13,8 +13,11 @@ class SplicerList extends React.Component {
                   ? 'splicer__list hidden'
                   : 'splicer__list';
 
-    let items = this.props.data.map((item) => {
-      return <SplicerListItem data={item} />;
+    let items = this.props.data.map((item, idx) => {
+      return <SplicerListItem
+        key={idx}
+        data={item}
+        callback={this.props.insertFn} />;
     });
 
     return (
