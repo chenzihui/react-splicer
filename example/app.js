@@ -17,15 +17,12 @@ var transformFn = function transformFn(text) {
   return ":" + text + ":";
 };
 
-var callback = function callback() {};
-
 var App = (function (_React$Component) {
   function App() {
     _classCallCheck(this, App);
 
-    if (_React$Component != null) {
-      _React$Component.apply(this, arguments);
-    }
+    this.state = { result: null };
+    this._callback = this._callback.bind(this);
   }
 
   _inherits(App, _React$Component);
@@ -33,7 +30,8 @@ var App = (function (_React$Component) {
   _createClass(App, {
     render: {
       value: function render() {
-        var data = ["Apple", "Orange", "Banana", "Pineapple"];
+        var data = ["Apple", "Orange", "Banana", "Pineapple"],
+            result = this.state.result;
 
         return React.createElement(
           "div",
@@ -42,8 +40,23 @@ var App = (function (_React$Component) {
             charCount: 2,
             data: data,
             transformFn: transformFn,
-            callback: callback })
+            callback: this._callback }),
+          React.createElement(
+            "div",
+            { className: "result" },
+            "The result of the callback is: ",
+            React.createElement(
+              "span",
+              { className: "content" },
+              result
+            )
+          )
         );
+      }
+    },
+    _callback: {
+      value: function _callback(text) {
+        return this.setState({ result: text });
       }
     }
   });
@@ -19865,6 +19878,7 @@ var Splicer = (function (_React$Component) {
 
     this.state = { selectables: [], selectedIndex: 0 };
 
+    this._insertSelected = this._insertSelected.bind(this);
     this._handleKeyPress = this._handleKeyPress.bind(this);
     this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleKeyUp = this._handleKeyUp.bind(this);
@@ -19907,7 +19921,11 @@ var Splicer = (function (_React$Component) {
       value: function _handleKeyPress(evt) {
         if (evt.which === KEYS.ENTER) {
           evt.preventDefault();
-          return this._fireCallback(evt.target.textContent);
+          if (this.state.selectables.length > 0) {
+            return this._insertSelected(this.state.selectables[this.state.selectedIndex]);
+          } else {
+            return this._fireCallback(evt.target.textContent);
+          }
         }
       }
     },
@@ -19976,8 +19994,54 @@ var Splicer = (function (_React$Component) {
     },
     _insertSelected: {
       value: function _insertSelected(data) {
-        var result = this.props.transformFn(data);
-        console.log(result);
+        var result = this.props.transformFn(data),
+            sel = window.getSelection(),
+            range = sel.getRangeAt(0),
+            input = React.findDOMNode(this.refs.userInput),
+            nodes = undefined,
+            startNode = undefined,
+            words = undefined,
+            lastWord = undefined,
+            wordStart = undefined,
+            wordEnd = undefined,
+            i = undefined;
+
+        input.normalize();
+        range.collapse(true);
+        range.setStart(input, 0);
+
+        nodes = Array.prototype.filter.call(input.childNodes, function (node) {
+          return node.nodeType === 3;
+        });
+
+        nodes = nodes.reverse();
+
+        for (i = 0; i < nodes.length; i++) {
+          if (!!nodes[i].nodeValue.trim()) {
+            startNode = nodes[i];
+          }
+        }
+
+        words = range.toString().split(" ");
+        lastWord = words[words.length - 1];
+
+        wordStart = range.toString().lastIndexOf(lastWord);
+        wordEnd = wordStart + lastWord.length;
+
+        range.setStart(startNode, wordStart);
+        range.setEnd(startNode, wordEnd);
+        range.deleteContents();
+
+        var el = document.createTextNode(result);
+
+        range.insertNode(el);
+        range.setStartAfter(el);
+
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        this.setState({ selectables: [], selectedIndex: 0 });
       }
     }
   });
@@ -20063,15 +20127,13 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var React = _interopRequire(require("react"));
 
-var ENTER_KEY = 13;
-
 var SplicerListItem = (function (_React$Component) {
   function SplicerListItem(props) {
     _classCallCheck(this, SplicerListItem);
 
     _get(Object.getPrototypeOf(SplicerListItem.prototype), "constructor", this).call(this, props);
 
-    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleClick = this._handleClick.bind(this);
   }
 
   _inherits(SplicerListItem, _React$Component);
@@ -20090,19 +20152,16 @@ var SplicerListItem = (function (_React$Component) {
               className: classes,
               ref: "selectable",
               href: "#",
-              onKeyPress: this._handleKeyPress },
+              onClick: this._handleClick },
             this.props.data
           )
         );
       }
     },
-    _handleKeyPress: {
-      value: function _handleKeyPress(evt) {
+    _handleClick: {
+      value: function _handleClick(evt) {
         evt.preventDefault();
-
-        if (evt.which === ENTER_KEY) {
-          this.props.callback(this.props.data);
-        }
+        this.props.callback(this.props.data);
       }
     }
   });

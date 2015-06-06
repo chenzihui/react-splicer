@@ -22,7 +22,7 @@ body {
 }
 
 .splicer {
-
+  position: relative;
 }
 
 .splicer__user-input {
@@ -36,9 +36,12 @@ body {
 }
 
 .splicer__list {
+  background-color: #fff;
   list-style-type: none;
   margin: 0;
   padding: 0;
+  position: absolute;
+  width: 600px;
 }
 
 .splicer__list__item {
@@ -60,4 +63,13 @@ body {
 .splicer__list__item a.focus {
   background-color: #f2f4f6;
   outline: 0;
+}
+
+.result {
+  font-size: 13px;
+  margin: 20px 0 0 5px;
+}
+
+.result .content {
+  font-weight: bold;
 }

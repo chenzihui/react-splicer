@@ -2,13 +2,11 @@
 
 import React from 'react';
 
-const ENTER_KEY = 13;
-
 class SplicerListItem extends React.Component {
   constructor(props) {
     super(props);
 
-    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleClick = this._handleClick.bind(this);
   }
 
   render() {
@@ -20,17 +18,14 @@ class SplicerListItem extends React.Component {
           className={classes}
           ref="selectable"
           href="#"
-          onKeyPress={this._handleKeyPress}>{this.props.data}</a>
+          onClick={this._handleClick}>{this.props.data}</a>
       </li>
     );
   }
 
-  _handleKeyPress(evt) {
+  _handleClick(evt) {
     evt.preventDefault();
-
-    if (evt.which === ENTER_KEY) {
-      this.props.callback(this.props.data);
-    }
+    this.props.callback(this.props.data);
   }
 };
 

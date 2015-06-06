@@ -16,6 +16,7 @@ class Splicer extends React.Component {
 
     this.state = { selectables: [], selectedIndex: 0 };
 
+    this._insertSelected = this._insertSelected.bind(this);
     this._handleKeyPress = this._handleKeyPress.bind(this);
     this._handleKeyDown  = this._handleKeyDown.bind(this);
     this._handleKeyUp    = this._handleKeyUp.bind(this);
@@ -53,7 +54,12 @@ class Splicer extends React.Component {
   _handleKeyPress(evt) {
     if (evt.which === KEYS.ENTER) {
       evt.preventDefault();
-      return this._fireCallback(evt.target.textContent);
+      if (this.state.selectables.length > 0) {
+        return this._insertSelected(
+          this.state.selectables[this.state.selectedIndex]);
+      } else {
+        return this._fireCallback(evt.target.textContent);
+      }
     }
   }
 
@@ -120,8 +126,49 @@ class Splicer extends React.Component {
   }
 
   _insertSelected(data) {
-    let result = this.props.transformFn(data);
-    console.log(result);
+    let result = this.props.transformFn(data),
+        sel    = window.getSelection(),
+        range  = sel.getRangeAt(0),
+        input  = React.findDOMNode(this.refs.userInput),
+
+        nodes, startNode, words, lastWord, wordStart, wordEnd, i;
+
+    input.normalize();
+    range.collapse(true);
+    range.setStart(input, 0);
+
+    nodes = Array.prototype.filter.call(input.childNodes, (node) => {
+      return node.nodeType === 3;
+    });
+
+    nodes = nodes.reverse();
+
+    for (i = 0; i < nodes.length; i++) {
+      if (!!nodes[i].nodeValue.trim()) {
+        startNode = nodes[i]
+      }
+    }
+
+    words = range.toString().split(' ');
+    lastWord = words[words.length - 1];
+
+    wordStart = range.toString().lastIndexOf(lastWord);
+    wordEnd   = wordStart + lastWord.length;
+
+    range.setStart(startNode, wordStart);
+    range.setEnd(startNode, wordEnd);
+    range.deleteContents();
+
+    let el   = document.createTextNode(result);
+
+    range.insertNode(el);
+    range.setStartAfter(el);
+
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    this.setState({ selectables: [], selectedIndex: 0 });
   }
 };
 

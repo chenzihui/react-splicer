@@ -22,9 +22,7 @@ describe('Splicer list item', () => {
   it('should fire a callback when the enter key is pressed', () => {
     let node = React.findDOMNode(tree.refs.selectable);
 
-    TestUtils.Simulate.focus(node);
-    TestUtils.Simulate.keyPress(node, { which: 13 });
-
+    TestUtils.Simulate.click(node);
     expect(callback).toBeCalledWith(data);
   });
 });

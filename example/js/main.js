@@ -7,13 +7,15 @@ let transformFn = function(text) {
   return `:${text}:`;
 };
 
-let callback = function() {
-
-};
-
 class App extends React.Component {
+  constructor() {
+    this.state = { result: null };
+    this._callback = this._callback.bind(this);
+  }
+
   render() {
-    let data = ['Apple', 'Orange', 'Banana', 'Pineapple'];
+    let data = ['Apple', 'Orange', 'Banana', 'Pineapple'],
+        result = this.state.result;
 
     return (
       <div className="container">
@@ -21,9 +23,17 @@ class App extends React.Component {
           charCount={2}
           data={data}
           transformFn={transformFn}
-          callback={callback} />
+          callback={this._callback} />
+
+        <div className="result">The result of the callback is:&nbsp;
+          <span className="content">{result}</span>
+        </div>
       </div>
     );
+  }
+
+  _callback(text) {
+    return this.setState({ result: text });
   }
 };
 
