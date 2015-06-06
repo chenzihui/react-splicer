@@ -27,9 +27,8 @@ body {
 
 .splicer__user-input {
   border: 1px solid #ddd;
-  border-radius: 3px;
-  height: 34px;
-  padding: 5px 10px 7px;
+  min-height: 34px;
+  padding: 5px 10px 6px;
 }
 
 .splicer__user-input:focus {
@@ -37,14 +36,12 @@ body {
 }
 
 .splicer__list {
-  box-shadow: 0 -1px 0 rgba(0,0,0,.2);
   list-style-type: none;
-  margin: -1px 0 0;
+  margin: 0;
   padding: 0;
 }
 
 .splicer__list__item {
-  background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-top: none;
 }
@@ -52,10 +49,15 @@ body {
 .splicer__list__item a {
   color: #05a9e3;
   display: block;
-  padding: 5px 10px 7px;
+  padding: 5px 10px 6px;
   text-decoration: none;
 }
 
 .splicer__list__item a:hover {
+  background-color: #f9f9f9;
+}
+
+.splicer__list__item a.focus {
   background-color: #f2f4f6;
+  outline: 0;
 }

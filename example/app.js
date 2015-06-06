@@ -19852,7 +19852,9 @@ var SplicerList = _interopRequire(require("./SplicerList"));
 
 var KEYS = {
   ENTER: 13,
-  ESC: 27
+  ESC: 27,
+  DOWN: 40,
+  UP: 38
 };
 
 var Splicer = (function (_React$Component) {
@@ -19861,9 +19863,10 @@ var Splicer = (function (_React$Component) {
 
     _get(Object.getPrototypeOf(Splicer.prototype), "constructor", this).call(this, props);
 
-    this.state = { searchTerm: null };
+    this.state = { selectables: [], selectedIndex: 0 };
 
     this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleKeyUp = this._handleKeyUp.bind(this);
   }
 
@@ -19872,18 +19875,6 @@ var Splicer = (function (_React$Component) {
   _createClass(Splicer, {
     render: {
       value: function render() {
-        var _this = this;
-
-        var data = undefined;
-
-        if (this.state.searchTerm) {
-          data = this.props.data.filter(function (item) {
-            return item.toLowerCase().indexOf(_this.state.searchTerm.toLowerCase()) !== -1;
-          });
-        } else {
-          data = [];
-        }
-
         return React.createElement(
           "div",
           { className: "splicer" },
@@ -19891,12 +19882,25 @@ var Splicer = (function (_React$Component) {
             ref: "userInput",
             className: "splicer__user-input",
             contentEditable: "true",
+            onKeyDown: this._handleKeyDown,
             onKeyPress: this._handleKeyPress,
             onKeyUp: this._handleKeyUp }),
           React.createElement(SplicerList, {
-            data: data,
+            selectedIdx: this.state.selectedIndex,
+            data: this.state.selectables,
             insertFn: this._insertSelected })
         );
+      }
+    },
+    _handleKeyDown: {
+      value: function _handleKeyDown(evt) {
+        var splicerList = document.querySelector(".splicer__list");
+
+        if (evt.which === KEYS.DOWN || evt.which === KEYS.UP) {
+          if (this.state.selectables.length !== 0) {
+            evt.preventDefault();
+          }
+        }
       }
     },
     _handleKeyPress: {
@@ -19914,7 +19918,11 @@ var Splicer = (function (_React$Component) {
         }
 
         if (evt.which === KEYS.ESC) {
-          return this.setState({ searchTerm: null });
+          return this.setState({ selectables: [], selectedIndex: 0 });
+        }
+
+        if (evt.which === KEYS.UP || evt.which === KEYS.DOWN) {
+          this._setSelectedItem(evt.which);
         }
 
         this._setSearchTerm();
@@ -19927,13 +19935,27 @@ var Splicer = (function (_React$Component) {
         }
       }
     },
+    _setSelectedItem: {
+      value: function _setSelectedItem(keyCode) {
+        var selectedIdx = undefined;
+
+        if (keyCode === KEYS.UP) {
+          selectedIdx = this.state.selectedIndex === 0 ? this.state.selectables.length - 1 : this.state.selectedIndex - 1;
+        } else if (keyCode === KEYS.DOWN) {
+          selectedIdx = this.state.selectedIndex === this.state.selectables.length - 1 ? 0 : this.state.selectedIndex + 1;
+        }
+
+        this.setState({ selectedIndex: selectedIdx });
+      }
+    },
     _setSearchTerm: {
       value: function _setSearchTerm() {
         var selection = window.getSelection(),
             range = selection.getRangeAt(0),
             userInput = React.findDOMNode(this.refs.userInput),
             content = undefined,
-            searchTerm = undefined;
+            searchTerm = undefined,
+            selectables = undefined;
 
         range.collapse(true);
         range.setStart(userInput, 0);
@@ -19942,9 +19964,13 @@ var Splicer = (function (_React$Component) {
         searchTerm = content[content.length - 1];
 
         if (searchTerm.length >= this.props.charCount) {
-          this.setState({ searchTerm: searchTerm });
+          selectables = this.props.data.filter(function (item) {
+            return item.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1;
+          });
+
+          this.setState({ selectables: selectables });
         } else {
-          this.setState({ searchTerm: null });
+          this.setState({ selectables: [] });
         }
       }
     },
@@ -19997,8 +20023,11 @@ var SplicerList = (function (_React$Component) {
         var classes = this.props.data.length === 0 ? "splicer__list hidden" : "splicer__list";
 
         var items = this.props.data.map(function (item, idx) {
+          var focus = _this.props.selectedIdx === idx;
+
           return React.createElement(SplicerListItem, {
             key: idx,
+            focus: focus,
             data: item,
             callback: _this.props.insertFn });
         });
@@ -20050,12 +20079,15 @@ var SplicerListItem = (function (_React$Component) {
   _createClass(SplicerListItem, {
     render: {
       value: function render() {
+        var classes = this.props.focus ? "focus" : "";
+
         return React.createElement(
           "li",
           { className: "splicer__list__item" },
           React.createElement(
             "a",
             {
+              className: classes,
               ref: "selectable",
               href: "#",
               onKeyPress: this._handleKeyPress },

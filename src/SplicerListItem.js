@@ -12,9 +12,12 @@ class SplicerListItem extends React.Component {
   }
 
   render() {
+    let classes = this.props.focus ? 'focus' : '';
+
     return (
       <li className="splicer__list__item">
         <a
+          className={classes}
           ref="selectable"
           href="#"
           onKeyPress={this._handleKeyPress}>{this.props.data}</a>

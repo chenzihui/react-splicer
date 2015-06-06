@@ -14,8 +14,11 @@ class SplicerList extends React.Component {
                   : 'splicer__list';
 
     let items = this.props.data.map((item, idx) => {
+      let focus = this.props.selectedIdx === idx;
+
       return <SplicerListItem
         key={idx}
+        focus={focus}
         data={item}
         callback={this.props.insertFn} />;
     });
