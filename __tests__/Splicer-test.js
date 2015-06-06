@@ -30,7 +30,7 @@ describe('Splicer', () => {
       tree, 'splicer__user-input');
 
     input.getDOMNode().innerHTML = 'Hello, world';
-    TestUtils.Simulate.keyPress(input, { which: 13 });
+    TestUtils.Simulate.keyUp(input, { which: 13 });
 
     expect(callback).toBeCalledWith('Hello, world');
   });
@@ -39,7 +39,7 @@ describe('Splicer', () => {
     let input = TestUtils.findRenderedDOMComponentWithClass(
       tree, 'splicer__user-input');
 
-    TestUtils.Simulate.keyPress(input, { which: 13 });
+    TestUtils.Simulate.keyUp(input, { which: 13 });
     expect(callback).not.toBeCalled();
   });
 });

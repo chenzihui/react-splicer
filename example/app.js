@@ -19848,7 +19848,6 @@ var Splicer = (function (_React$Component) {
 
     this.state = { searchTerm: null };
 
-    this._handleKeyPress = this._handleKeyPress.bind(this);
     this._handleKeyUp = debounce(this._handleKeyUp, 100).bind(this);
   }
 
@@ -19864,29 +19863,25 @@ var Splicer = (function (_React$Component) {
             ref: "userInput",
             className: "splicer__user-input",
             contentEditable: "true",
-            onKeyPress: this._handleKeyPress,
             onKeyUp: this._handleKeyUp })
         );
-      }
-    },
-    _handleKeyPress: {
-      value: function _handleKeyPress(evt) {
-        if (evt.which === ENTER_KEY) {
-          evt.preventDefault();
-          evt.stopPropagation();
-
-          if (evt.target.textContent.trim()) {
-            return this.props.callback(evt.target.textContent);
-          }
-        }
       }
     },
     _handleKeyUp: {
       value: function _handleKeyUp(evt) {
         if (evt.which === ENTER_KEY) {
-          return;
+          evt.preventDefault();
+          return this._fireCallback(evt.target.textContent);
         }
+
         this._setSearchTerm();
+      }
+    },
+    _fireCallback: {
+      value: function _fireCallback(textContent) {
+        if (textContent.trim()) {
+          return this.props.callback(textContent);
+        }
       }
     },
     _setSearchTerm: {

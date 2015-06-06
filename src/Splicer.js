@@ -11,8 +11,7 @@ class Splicer extends React.Component {
 
     this.state = { searchTerm: null };
 
-    this._handleKeyPress = this._handleKeyPress.bind(this);
-    this._handleKeyUp    = debounce(this._handleKeyUp, 100).bind(this);
+    this._handleKeyUp = debounce(this._handleKeyUp, 100).bind(this);
   }
 
   render() {
@@ -22,26 +21,24 @@ class Splicer extends React.Component {
           ref="userInput"
           className="splicer__user-input"
           contentEditable="true"
-          onKeyPress={this._handleKeyPress}
           onKeyUp={this._handleKeyUp}></div>
       </div>
     );
   }
 
-  _handleKeyPress(evt) {
+  _handleKeyUp(evt) {
     if (evt.which === ENTER_KEY) {
       evt.preventDefault();
-      evt.stopPropagation();
-
-      if (evt.target.textContent.trim()) {
-        return this.props.callback(evt.target.textContent);
-      }
+      return this._fireCallback(evt.target.textContent);
     }
+
+    this._setSearchTerm();
   }
 
-  _handleKeyUp(evt) {
-    if (evt.which === ENTER_KEY) { return; }
-    this._setSearchTerm();
+  _fireCallback(textContent) {
+    if (textContent.trim()) {
+      return this.props.callback(textContent);
+    }
   }
 
   _setSearchTerm() {
