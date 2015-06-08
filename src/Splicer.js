@@ -131,7 +131,7 @@ class Splicer extends React.Component {
         range  = sel.getRangeAt(0),
         input  = React.findDOMNode(this.refs.userInput),
 
-        nodes, startNode, words, lastWord, wordStart, wordEnd, i;
+        nodes, startNode, words, lastWord, wordStart, wordEnd, i, el;
 
     input.normalize();
     range.collapse(true);
@@ -159,7 +159,11 @@ class Splicer extends React.Component {
     range.setEnd(startNode, wordEnd);
     range.deleteContents();
 
-    let el   = document.createTextNode(result);
+    if (typeof(result) === 'string') {
+      el = document.createTextNode(result);
+    } else {
+      el = result;
+    }
 
     range.insertNode(el);
     range.setStartAfter(el);
