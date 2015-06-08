@@ -14,7 +14,13 @@ var React = _interopRequire(require("react"));
 var Splicer = _interopRequire(require("../../src/Splicer"));
 
 var transformFn = function transformFn(text) {
-  return ":" + text + ":";
+  var el = document.createElement("span");
+
+  el.innerHTML = text;
+  el.setAttribute("class", "mention");
+  el.setAttribute("contenteditable", false);
+
+  return el;
 };
 
 var App = (function (_React$Component) {
@@ -30,27 +36,42 @@ var App = (function (_React$Component) {
   _createClass(App, {
     render: {
       value: function render() {
-        var data = ["Apple", "Orange", "Banana", "Pineapple"],
+        var data = ["apple", "orange", "banana", "pineapple"],
             result = this.state.result;
 
         return React.createElement(
           "div",
           { className: "container" },
+          React.createElement(
+            "h1",
+            { className: "container__title" },
+            "How it works?"
+          ),
+          React.createElement(
+            "p",
+            null,
+            "react-splicer is a component for creating Facebook-like mentions in user input elements."
+          ),
+          React.createElement(
+            "p",
+            null,
+            "Here, we have provided the component with an array of strings i.e. 'apple', 'orange', 'banana', 'pineapple' as the dataset to be searched when the user provides input."
+          ),
+          React.createElement(
+            "p",
+            null,
+            "We have configured the component such that the search is only conducted when there are at least 2 characters entered. Try entering 'ap'."
+          ),
+          React.createElement(
+            "p",
+            null,
+            "Upon selecting an option from the dropdown list, the `transformFn` is called, which in this case simply inserts a span containing the selected text element."
+          ),
           React.createElement(Splicer, {
             charCount: 2,
             data: data,
             transformFn: transformFn,
-            callback: this._callback }),
-          React.createElement(
-            "div",
-            { className: "result" },
-            "The result of the callback is: ",
-            React.createElement(
-              "span",
-              { className: "content" },
-              result
-            )
-          )
+            callback: this._callback })
         );
       }
     },
@@ -20004,7 +20025,8 @@ var Splicer = (function (_React$Component) {
             lastWord = undefined,
             wordStart = undefined,
             wordEnd = undefined,
-            i = undefined;
+            i = undefined,
+            el = undefined;
 
         input.normalize();
         range.collapse(true);
@@ -20032,7 +20054,11 @@ var Splicer = (function (_React$Component) {
         range.setEnd(startNode, wordEnd);
         range.deleteContents();
 
-        var el = document.createTextNode(result);
+        if (typeof result === "string") {
+          el = document.createTextNode(result);
+        } else {
+          el = result;
+        }
 
         range.insertNode(el);
         range.setStartAfter(el);
