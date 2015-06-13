@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>React Splicer | A React.js Component</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400">
+    <link rel="stylesheet" href="prism.css" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div class="container">
+      <section class="hero">
+        <p class="hero__desc">A React.js component for inserting Facebook-like
+        mentions.</p>
+
+        <span class="hero__npm">npm install react-splicer --save</span>
+
+        <p class="hero__link"><a href="https://github.com/chenzihui/react-splicer" target="_blank">Source code available</a> on Github.</p>
+      </section>
+
+      <section class="demo">
+        <h2 class="demo__title">How it works?</h2>
+
+        <p>The component listens to user input events and displays a list of suggestions based on the original data set passed into it. Upon selection of any item in the list, <span class="pill">this.props.transformFn</span> is called and the result of this function is inserted into the input field.</p>
+
+        <p><span class="pill">this.props.callback</span> is fired when the Enter key is pressed.</p>
+
+        <div class="group">
+          <section class="demo__source">
+            <pre><code class="language-jsx">import React from 'react';
+import Splicer from 'react-splicer';
+
+/**
+ * Function is called when an item from the suggested results is selected.
+ * This is where you would want to manipulate the selected text before inserting
+ * it into the user input element.
+ *
+ * Examples could be adding ":" on either side of the selected text or in this
+ * case, creating a `span` element containing the text.
+ *
+ * @param {string}
+ */
+
+let transformFn = function(text) {
+  let el = document.createElement('span');
+
+  el.innerHTML = text;
+  el.setAttribute('class', 'mention');
+  el.setAttribute('contenteditable', false);
+
+  return el;
+};
+
+class App extends React.Component {
+  constructor() {
+    this._callback = this._callback.bind(this);
+  }
+
+  render() {
+    // The data set we are passing to our component.
+    let data   = ['John', 'Johnny', 'Steve', 'Alex'];
+
+    // The number of characters that must be typed before searching
+    // for suggestions
+    let charCount = 2;
+
+    // Angle brackets are missing here. Am doing this as a workaround to
+    // not have them display as HTML
+    return Splicer
+      charCount={charCount}
+      data={data}
+      transformFn={transformFn}
+      callback={this._callback}
+  }
+
+  /**
+   * This is the function that gets fired when the ENTER key is pressed.
+   * Typically you would use this to do something with the contents of
+   * the user input element
+   *
+   */
+
+  _callback(text) {
+    console.log('The callback was fired.');
+  }
+};
+
+React.render(<App />, document.querySelector('#demo__app'));
+</code></pre>
+          </section>
+
+          <section id="demo__app"></section>
+        </div>
+      </section>
+
+      <footer class="footer group">
+        <div class="footer__author">
+          <p>Created by <a href="http://chenzihui.com">Chen Zihui</a></p>
+          <p>MIT License</p>
+        </div>
+
+        <div class="footer__social">
+          <a href="https://twitter.com/jetupper" class="twitter-follow-button" data-show-count="false">Follow @jetupper</a>
+
+          <a class="github-button" href="https://github.com/chenzihui/react-splicer" data-icon="octicon-star" data-count-href="/chenzihui/react-splicer/stargazers" data-count-api="/repos/chenzihui/react-splicer#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star chenzihui/react-splicer on GitHub">Star</a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="prism.min.js"></script>
+
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+    <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+  </body>
+</html>

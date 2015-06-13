@@ -20,15 +20,11 @@ function _setupBrowserify(path, debug) {
 }
 
 gulp.task('clean:dist', function(done) {
-  return del(['dist'], done);
+  return del(['app.js'], done);
 });
 
-gulp.task('clean:example', function(done) {
-  return del(['example/app.js'], done);
-});
-
-gulp.task('example:dev', ['clean:example'], function() {
-  var b = _setupBrowserify('./example/js/main.js'),
+gulp.task('dev', ['clean:dist'], function() {
+  var b = _setupBrowserify('./src/index.js'),
       w = watchify(b);
 
   return w.on('update', function() {
@@ -37,18 +33,18 @@ gulp.task('example:dev', ['clean:example'], function() {
     w.bundle()
       .pipe(plumber())
       .pipe(source('app.js'))
-      .pipe(gulp.dest('./example/'));
+      .pipe(gulp.dest('./'));
 
     gutil.log(
       'Updated', '\'' + gutil.colors.cyan('js') + '\'');
   }).bundle()
     .pipe(plumber())
     .pipe(source('app.js'))
-    .pipe(gulp.dest('./example/'));
+    .pipe(gulp.dest('./'));
 });
 
-gulp.task('webserver', ['example:dev'], function() {
-  return gulp.src('./example/')
+gulp.task('webserver', ['dev'], function() {
+  return gulp.src('.')
     .pipe(webserver({
       port: 8080
     }));

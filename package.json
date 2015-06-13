@@ -1,23 +1,19 @@
 {
-  "name": "react-splicer",
-  "description": "A React.js component for inserting Facebook-like mentions",
+  "name": "react-splicer-demo",
+  "description": "A demo for react-splicer",
   "version": "0.1.1",
   "author": "Chen Zihui <hello@chenzihui.com>",
-  "main": "src/Splicer.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/chenzihui/react-splicer"
   },
   "homepage": "https://github.com/chenzihui/react-splicer",
   "bugs": "https://github.com/chenzihui/react-splicer/issues",
-  "scripts": {
-    "test": "jest"
-  },
-  "peerDependencies": {
-    "react": "^0.13.0"
+  "dependencies": {
+    "react": "^0.13.0",
+    "react-splicer": "^0.1.1"
   },
   "devDependencies": {
-    "babel-jest": "^4.0.0",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
     "del": "^1.1.1",
@@ -29,21 +25,6 @@
     "jest-cli": "^0.4.0",
     "vinyl-source-stream": "^1.0.0",
     "watchify": "^2.4.0"
-  },
-  "jest": {
-    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
-    "unmockedModulePathPatterns": [
-      "<rootDir>/node_modules/react"
-    ],
-    "testFileExtensions": [
-      "es6",
-      "js"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "es6"
-    ]
   },
   "license": "MIT",
   "tags": [
