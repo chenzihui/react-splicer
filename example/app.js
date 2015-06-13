@@ -19900,7 +19900,9 @@ var Splicer = (function (_React$Component) {
     this.state = { selectables: [], selectedIndex: 0 };
 
     this._insertSelected = this._insertSelected.bind(this);
-    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleEnterKey = this._handleEnterKey.bind(this);
+    this._resetState = this._resetState.bind(this);
+
     this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleKeyUp = this._handleKeyUp.bind(this);
   }
@@ -19918,7 +19920,6 @@ var Splicer = (function (_React$Component) {
             className: "splicer__user-input",
             contentEditable: "true",
             onKeyDown: this._handleKeyDown,
-            onKeyPress: this._handleKeyPress,
             onKeyUp: this._handleKeyUp }),
           React.createElement(SplicerList, {
             selectedIdx: this.state.selectedIndex,
@@ -19929,7 +19930,9 @@ var Splicer = (function (_React$Component) {
     },
     _handleKeyDown: {
       value: function _handleKeyDown(evt) {
-        var splicerList = document.querySelector(".splicer__list");
+        if (evt.which === KEYS.ENTER) {
+          evt.preventDefault();
+        }
 
         if (evt.which === KEYS.DOWN || evt.which === KEYS.UP) {
           if (this.state.selectables.length !== 0) {
@@ -19938,33 +19941,30 @@ var Splicer = (function (_React$Component) {
         }
       }
     },
-    _handleKeyPress: {
-      value: function _handleKeyPress(evt) {
-        if (evt.which === KEYS.ENTER) {
-          evt.preventDefault();
-          if (this.state.selectables.length > 0) {
-            return this._insertSelected(this.state.selectables[this.state.selectedIndex]);
-          } else {
-            return this._fireCallback(evt.target.textContent);
-          }
-        }
-      }
-    },
     _handleKeyUp: {
       value: function _handleKeyUp(evt) {
         if (evt.which === KEYS.ENTER) {
-          return;
+          return this._handleEnterKey(evt);
         }
 
         if (evt.which === KEYS.ESC) {
-          return this.setState({ selectables: [], selectedIndex: 0 });
+          return this._resetState();
         }
 
         if (evt.which === KEYS.UP || evt.which === KEYS.DOWN) {
-          this._setSelectedItem(evt.which);
+          return this._setSelectedItem(evt.which);
         }
 
         this._setSearchTerm();
+      }
+    },
+    _handleEnterKey: {
+      value: function _handleEnterKey(evt) {
+        if (this.state.selectables.length > 0) {
+          return this._insertSelected(this.state.selectables[this.state.selectedIndex]);
+        } else {
+          return this._fireCallback(evt.target.textContent);
+        }
       }
     },
     _fireCallback: {
@@ -20025,8 +20025,8 @@ var Splicer = (function (_React$Component) {
             lastWord = undefined,
             wordStart = undefined,
             wordEnd = undefined,
-            i = undefined,
-            el = undefined;
+            el = undefined,
+            space = undefined;
 
         input.normalize();
         range.collapse(true);
@@ -20038,11 +20038,11 @@ var Splicer = (function (_React$Component) {
 
         nodes = nodes.reverse();
 
-        for (i = 0; i < nodes.length; i++) {
-          if (!!nodes[i].nodeValue.trim()) {
-            startNode = nodes[i];
+        Array.prototype.forEach.call(nodes, function (node) {
+          if (node.nodeValue.trim()) {
+            startNode = node;
           }
-        }
+        });
 
         words = range.toString().split(" ");
         lastWord = words[words.length - 1];
@@ -20063,10 +20063,18 @@ var Splicer = (function (_React$Component) {
         range.insertNode(el);
         range.setStartAfter(el);
 
+        space = document.createTextNode(" ");
+        range.insertNode(space);
+        range.setStartAfter(space);
         range.collapse(false);
         sel.removeAllRanges();
         sel.addRange(range);
 
+        this._resetState();
+      }
+    },
+    _resetState: {
+      value: function _resetState() {
         this.setState({ selectables: [], selectedIndex: 0 });
       }
     }

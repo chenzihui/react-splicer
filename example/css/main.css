@@ -73,7 +73,8 @@ body {
 
 .mention {
   background-color: #f2f4f6;
-  border: 1px solid #aaa;
+  border: 1px solid #ccc;
   border-radius: 5px;
+  display: inline-block;
   padding: 1px 8px 3px;
 }

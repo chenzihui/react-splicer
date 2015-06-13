@@ -17,7 +17,9 @@ class Splicer extends React.Component {
     this.state = { selectables: [], selectedIndex: 0 };
 
     this._insertSelected = this._insertSelected.bind(this);
-    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleEnterKey = this._handleEnterKey.bind(this);
+    this._resetState     = this._resetState.bind(this);
+
     this._handleKeyDown  = this._handleKeyDown.bind(this);
     this._handleKeyUp    = this._handleKeyUp.bind(this);
   }
@@ -30,7 +32,6 @@ class Splicer extends React.Component {
           className="splicer__user-input"
           contentEditable="true"
           onKeyDown={this._handleKeyDown}
-          onKeyPress={this._handleKeyPress}
           onKeyUp={this._handleKeyUp}></div>
 
         <SplicerList
@@ -42,7 +43,9 @@ class Splicer extends React.Component {
   }
 
   _handleKeyDown(evt) {
-    let splicerList = document.querySelector('.splicer__list');
+    if (evt.which === KEYS.ENTER) {
+      evt.preventDefault();
+    }
 
     if (evt.which === KEYS.DOWN || evt.which === KEYS.UP) {
       if (this.state.selectables.length !== 0) {
@@ -51,32 +54,29 @@ class Splicer extends React.Component {
     }
   }
 
-  _handleKeyPress(evt) {
-    if (evt.which === KEYS.ENTER) {
-      evt.preventDefault();
-      if (this.state.selectables.length > 0) {
-        return this._insertSelected(
-          this.state.selectables[this.state.selectedIndex]);
-      } else {
-        return this._fireCallback(evt.target.textContent);
-      }
-    }
-  }
-
   _handleKeyUp(evt) {
     if (evt.which === KEYS.ENTER) {
-      return;
+      return this._handleEnterKey(evt);
     }
 
     if (evt.which === KEYS.ESC) {
-      return this.setState({ selectables: [], selectedIndex: 0 });
+      return this._resetState();
     }
 
     if (evt.which === KEYS.UP || evt.which === KEYS.DOWN) {
-      this._setSelectedItem(evt.which);
+      return this._setSelectedItem(evt.which);
     }
 
     this._setSearchTerm();
+  }
+
+  _handleEnterKey(evt) {
+    if (this.state.selectables.length > 0) {
+      return this._insertSelected(
+        this.state.selectables[this.state.selectedIndex]);
+    } else {
+      return this._fireCallback(evt.target.textContent);
+    }
   }
 
   _fireCallback(textContent) {
@@ -131,7 +131,7 @@ class Splicer extends React.Component {
         range  = sel.getRangeAt(0),
         input  = React.findDOMNode(this.refs.userInput),
 
-        nodes, startNode, words, lastWord, wordStart, wordEnd, i, el;
+        nodes, startNode, words, lastWord, wordStart, wordEnd, el, space;
 
     input.normalize();
     range.collapse(true);
@@ -143,11 +143,11 @@ class Splicer extends React.Component {
 
     nodes = nodes.reverse();
 
-    for (i = 0; i < nodes.length; i++) {
-      if (!!nodes[i].nodeValue.trim()) {
-        startNode = nodes[i]
+    Array.prototype.forEach.call(nodes, (node) => {
+      if (node.nodeValue.trim()) {
+        startNode = node;
       }
-    }
+    });
 
     words = range.toString().split(' ');
     lastWord = words[words.length - 1];
@@ -168,10 +168,17 @@ class Splicer extends React.Component {
     range.insertNode(el);
     range.setStartAfter(el);
 
+    space = document.createTextNode('\u00a0');
+    range.insertNode(space);
+    range.setStartAfter(space);
     range.collapse(false);
     sel.removeAllRanges();
     sel.addRange(range);
 
+    this._resetState();
+  }
+
+  _resetState() {
     this.setState({ selectables: [], selectedIndex: 0 });
   }
 };
