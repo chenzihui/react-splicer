@@ -1,7 +1,7 @@
 {
   "name": "react-splicer",
   "description": "A React.js component for inserting Facebook-like mentions",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Chen Zihui <hello@chenzihui.com>",
   "main": "src/Splicer.js",
   "repository": {
